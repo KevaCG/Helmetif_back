@@ -1,7 +1,11 @@
-const { Sequelize, Op } = require('sequelize');
+// src/services/cascoService.js
 const Casco = require('../models/casco');
+const Categoria = require('../models/categoria');
+const Marca = require('../models/marca');
+const Tallas = require('../models/tallas');
+const Norma = require('../models/norma');
+const Material = require('../models/material');
 
-// Función para crear un nuevo casco
 const createCasco = async (cascoData) => {
     try {
         const casco = await Casco.create(cascoData);
@@ -11,26 +15,27 @@ const createCasco = async (cascoData) => {
     }
 };
 
-// Función para obtener todos los cascos
 const getAllCascos = async () => {
     try {
-        const cascoss = await Casco.findAll();
+        const cascoss = await Casco.findAll({
+            include: [Categoria, Marca, Tallas, Norma, Material]
+        });
         return cascoss;
     } catch (error) {
         throw new Error(error.message);
     }
 };
 
-// Función para obtener un casco por id o referencia
 const getCascoByIdOrReferencia = async (idOrReferencia) => {
     try {
         const casco = await Casco.findOne({
             where: {
-                [Sequelize.Op.or]: [
+                [Op.or]: [
                     { id: idOrReferencia },
                     { referencia: idOrReferencia }
                 ]
-            }
+            },
+            include: [Categoria, Marca, Tallas, Norma, Material]
         });
         if (!casco) {
             throw new Error('No se encontró un casco con esa referencia o id');
@@ -41,12 +46,11 @@ const getCascoByIdOrReferencia = async (idOrReferencia) => {
     }
 };
 
-// Función para actualizar un casco por id o referencia
 const updateCascoByIdOrReferencia = async (idOrReferencia, updateData) => {
     try {
         const [updated] = await Casco.update(updateData, {
             where: {
-                [Sequelize.Op.or]: [
+                [Op.or]: [
                     { id: idOrReferencia },
                     { referencia: idOrReferencia }
                 ]
@@ -58,23 +62,23 @@ const updateCascoByIdOrReferencia = async (idOrReferencia, updateData) => {
         }
         return await Casco.findOne({
             where: {
-                [Sequelize.Op.or]: [
+                [Op.or]: [
                     { id: idOrReferencia },
                     { referencia: idOrReferencia }
                 ]
-            }
+            },
+            include: [Categoria, Marca, Tallas, Norma, Material]
         });
     } catch (error) {
         throw new Error(error.message);
     }
 };
 
-// Función para eliminar un casco por id o referencia
 const deleteCascoByIdOrReferencia = async (idOrReferencia) => {
     try {
         const deleted = await Casco.destroy({
             where: {
-                [Sequelize.Op.or]: [
+                [Op.or]: [
                     { id: idOrReferencia },
                     { referencia: idOrReferencia }
                 ]
